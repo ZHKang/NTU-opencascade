@@ -48,6 +48,9 @@ protected:
 private:
 	Handle_V3d_View myView;
 	Standard_Boolean myHlrModeIsOn;
+public:
+	void FitAll() {   if ( !myView.IsNull() ) myView->FitAll();  myView->ZFitAll(); };
+	
 };
 
 #ifndef _DEBUG  // NTU_OCCView.cpp ¤¤ªº°»¿ùª©¥»

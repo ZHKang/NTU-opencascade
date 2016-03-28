@@ -6,6 +6,8 @@
 #pragma once
 #include <AIS_InteractiveContext.hxx>
 #include <V3d_Viewer.hxx>
+#include <OCC_3dDoc.h>
+#include <ColoredShapes.h>
 
 class CNTU_OCCDoc : public CDocument
 {
@@ -54,4 +56,12 @@ public:
 	Handle(V3d_Viewer) GetViewer() { return myViewer; }
 	afx_msg void OnImportIges();
 
+	static void ReadIGES(const Handle(AIS_InteractiveContext)& anInteractiveContext);
+	static Handle(TopTools_HSequenceOfShape) ReadIGES(); // not by reference --> the sequence is created here !!
+	static Standard_Integer ReadIGES(const Standard_CString& aFileName,
+		Handle(TopTools_HSequenceOfShape)& aHSequenceOfShape);
+	static void Fit();
+
+protected:
+	CColoredShapes* m_pcoloredshapeList;
 };

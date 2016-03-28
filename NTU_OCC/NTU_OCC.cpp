@@ -1,8 +1,9 @@
-
-// NTU_OCC.cpp : ©w¸qÀ³¥Îµ{¦¡ªºÃş§O¦æ¬°¡C
+ï»¿
+// NTU_OCC.cpp : å®šç¾©æ‡‰ç”¨ç¨‹å¼çš„é¡åˆ¥è¡Œç‚ºã€‚
 //
 
 #include "stdafx.h"
+#include <iostream>
 #include "afxwinappex.h"
 #include "afxdialogex.h"
 #include "NTU_OCC.h"
@@ -18,21 +19,21 @@
 //#define new DEBUG_NEW
 #endif
 
-
+using namespace std;
 
 // CNTU_OCCApp
 
 BEGIN_MESSAGE_MAP(CNTU_OCCApp, CWinAppEx)
 	ON_COMMAND(ID_APP_ABOUT, &CNTU_OCCApp::OnAppAbout)
-	// ¨Ì¾Ú¤å¥ó©R¥Oªº¼Ğ·ÇÀÉ®×
+	// ä¾æ“šæ–‡ä»¶å‘½ä»¤çš„æ¨™æº–æª”æ¡ˆ
 	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
 	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
-	// ¼Ğ·Ç¦C¦L³]©w©R¥O
+	// æ¨™æº–åˆ—å°è¨­å®šå‘½ä»¤
 	ON_COMMAND(ID_FILE_PRINT_SETUP, &CWinAppEx::OnFilePrintSetup)
 END_MESSAGE_MAP()
 
 
-// CNTU_OCCApp «Øºc
+// CNTU_OCCApp å»ºæ§‹
 
 CNTU_OCCApp::CNTU_OCCApp()
 {
@@ -48,46 +49,54 @@ CNTU_OCCApp::CNTU_OCCApp()
 		//AfxMessageBox("_T(Error Ocured in Initializing the Opencascade graphic variable.)");     
 	}  
 
-	// ¤ä´©­«·s±Ò°ÊºŞ²z­û
+	// æ”¯æ´é‡æ–°å•Ÿå‹•ç®¡ç†å“¡
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
 #ifdef _MANAGED
-	// ¦pªGÀ³¥Îµ{¦¡¬O¨Ï¥Î Common Language Runtime ¤ä´© (/clr) «Ø¸mªº:
-	//     1) ­n¨Ï­«·s±Ò°ÊºŞ²z­û¤ä´©¥¿±`¹B§@»İ­n³o­ÓÃB¥~³]©w¡C
-	//     2) ¦b±M®×¤¤¥²¶·±N°Ñ¦Ò¥[¤J¦Ü System.Windows.Forms ¤~¯à¶i¦æ«Ø¸m¡C
+	// å¦‚æœæ‡‰ç”¨ç¨‹å¼æ˜¯ä½¿ç”¨ Common Language Runtime æ”¯æ´ (/clr) å»ºç½®çš„:
+	//     1) è¦ä½¿é‡æ–°å•Ÿå‹•ç®¡ç†å“¡æ”¯æ´æ­£å¸¸é‹ä½œéœ€è¦é€™å€‹é¡å¤–è¨­å®šã€‚
+	//     2) åœ¨å°ˆæ¡ˆä¸­å¿…é ˆå°‡åƒè€ƒåŠ å…¥è‡³ System.Windows.Forms æ‰èƒ½é€²è¡Œå»ºç½®ã€‚
 	System::Windows::Forms::Application::SetUnhandledExceptionMode(System::Windows::Forms::UnhandledExceptionMode::ThrowException);
 #endif
 
-	// TODO: ¥H°ß¤@ªº ID ¦r¦ê¨ú¥N¤U­±ªºÀ³¥Îµ{¦¡ ID ¦r¦ê; «ØÄ³ªº
-	// ¦r¦ê®æ¦¡¬° CompanyName.ProductName.SubProduct.VersionInformation
+	// TODO: ä»¥å”¯ä¸€çš„ ID å­—ä¸²å–ä»£ä¸‹é¢çš„æ‡‰ç”¨ç¨‹å¼ ID å­—ä¸²; å»ºè­°çš„
+	// å­—ä¸²æ ¼å¼ç‚º CompanyName.ProductName.SubProduct.VersionInformation
 	SetAppID(_T("NTU_OCC.AppID.NoVersion"));
 
-	// TODO: ¦b¦¹¥[¤J«Øºcµ{¦¡½X¡A
-	// ±N©Ò¦³­«­nªºªì©l³]©w¥[¤J InitInstance ¤¤
+	// TODO: åœ¨æ­¤åŠ å…¥å»ºæ§‹ç¨‹å¼ç¢¼ï¼Œ
+	// å°‡æ‰€æœ‰é‡è¦çš„åˆå§‹è¨­å®šåŠ å…¥ InitInstance ä¸­
 }
 
-// ¶È¦³ªº¤@­Ó CNTU_OCCApp ª«¥ó
+// åƒ…æœ‰çš„ä¸€å€‹ CNTU_OCCApp ç‰©ä»¶
 
 CNTU_OCCApp theApp;
 
 
-// CNTU_OCCApp ªì©l³]©w
+// CNTU_OCCApp åˆå§‹è¨­å®š
 
 BOOL CNTU_OCCApp::InitInstance()
 {
-	// °²¦pÀ³¥Îµ{¦¡¸ê°T²M³æ«ü©w¨Ï¥Î ComCtl32.dll 6 (§t) ¥H«áª©¥»¡A
-	// ¨Ó±Ò°ÊµøÄ±¤Æ¼Ë¦¡¡A¦b Windows XP ¤W¡A«h»İ­n InitCommonControls()¡C
-	// §_«h¥ô¦óµøµ¡ªº«Ø¥ß³£±N¥¢±Ñ¡C
+	// The important lines:
+	AllocConsole() ;
+	AttachConsole( GetCurrentProcessId() ) ;
+	freopen( "CON", "w", stdout );
+
+	// create a new console to the process   
+	freopen( "CONOUT$", "w+t", stdout );// ç”³è¯·å†™
+	//freopen( "CONIN$", "r+t", stdin );  // ç”³è¯·è¯»
+	// å‡å¦‚æ‡‰ç”¨ç¨‹å¼è³‡è¨Šæ¸…å–®æŒ‡å®šä½¿ç”¨ ComCtl32.dll 6 (å«) ä»¥å¾Œç‰ˆæœ¬ï¼Œ
+	// ä¾†å•Ÿå‹•è¦–è¦ºåŒ–æ¨£å¼ï¼Œåœ¨ Windows XP ä¸Šï¼Œå‰‡éœ€è¦ InitCommonControls()ã€‚
+	// å¦å‰‡ä»»ä½•è¦–çª—çš„å»ºç«‹éƒ½å°‡å¤±æ•—ã€‚
 	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
-	// ³]©w­n¥]§t©Ò¦³±z·Q­n¥Î©óÀ³¥Îµ{¦¡¤¤ªº
-	// ³q¥Î±±¨î¶µÃş§O¡C
+	// è¨­å®šè¦åŒ…å«æ‰€æœ‰æ‚¨æƒ³è¦ç”¨æ–¼æ‡‰ç”¨ç¨‹å¼ä¸­çš„
+	// é€šç”¨æ§åˆ¶é …é¡åˆ¥ã€‚
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
 	CWinAppEx::InitInstance();
 
 
-	// ªì©l¤Æ OLE µ{¦¡®w
+	// åˆå§‹åŒ– OLE ç¨‹å¼åº«
 	if (!AfxOleInit())
 	{
 		AfxMessageBox(IDP_OLE_INIT_FAILED);
@@ -98,18 +107,18 @@ BOOL CNTU_OCCApp::InitInstance()
 
 	EnableTaskbarInteraction(FALSE);
 
-	// »İ­n¦³ AfxInitRichEdit2() ¤~¯à¨Ï¥Î RichEdit ±±¨î¶µ	
+	// éœ€è¦æœ‰ AfxInitRichEdit2() æ‰èƒ½ä½¿ç”¨ RichEdit æ§åˆ¶é …	
 	// AfxInitRichEdit2();
 
-	// ¼Ğ·Çªì©l³]©w
-	// ¦pªG±z¤£¨Ï¥Î³o¨Ç¥\¯à¨Ã¥B·Q´î¤Ö
-	// ³Ì«á§¹¦¨ªº¥i°õ¦æÀÉ¤j¤p¡A±z¥i¥H
-	// ±q¤U¦Cµ{¦¡½X²¾°£¤£»İ­nªºªì©l¤Æ±`¦¡¡A
-	// ÅÜ§óÀx¦s³]©w­Èªºµn¿ı¾÷½X
-	// TODO: ±zÀ³¸Ó¾A«×­×§ï¦¹¦r¦ê
-	// (¨Ò¦p¡A¤½¥q¦WºÙ©Î²ÕÂ´¦WºÙ)
-	SetRegistryKey(_T("¥»¾÷ AppWizard ©Ò²£¥ÍªºÀ³¥Îµ{¦¡"));
-	LoadStdProfileSettings(4);  // ¸ü¤J¼Ğ·Ç INI ÀÉ¿ï¶µ (¥]§t MRU)
+	// æ¨™æº–åˆå§‹è¨­å®š
+	// å¦‚æœæ‚¨ä¸ä½¿ç”¨é€™äº›åŠŸèƒ½ä¸¦ä¸”æƒ³æ¸›å°‘
+	// æœ€å¾Œå®Œæˆçš„å¯åŸ·è¡Œæª”å¤§å°ï¼Œæ‚¨å¯ä»¥
+	// å¾ä¸‹åˆ—ç¨‹å¼ç¢¼ç§»é™¤ä¸éœ€è¦çš„åˆå§‹åŒ–å¸¸å¼ï¼Œ
+	// è®Šæ›´å„²å­˜è¨­å®šå€¼çš„ç™»éŒ„æ©Ÿç¢¼
+	// TODO: æ‚¨æ‡‰è©²é©åº¦ä¿®æ”¹æ­¤å­—ä¸²
+	// (ä¾‹å¦‚ï¼Œå…¬å¸åç¨±æˆ–çµ„ç¹”åç¨±)
+	SetRegistryKey(_T("æœ¬æ©Ÿ AppWizard æ‰€ç”¢ç”Ÿçš„æ‡‰ç”¨ç¨‹å¼"));
+	LoadStdProfileSettings(4);  // è¼‰å…¥æ¨™æº– INI æª”é¸é … (åŒ…å« MRU)
 
 
 	InitContextMenuManager();
@@ -122,69 +131,70 @@ BOOL CNTU_OCCApp::InitInstance()
 	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
 		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
 
-	// µn¿ıÀ³¥Îµ{¦¡ªº¤å¥ó½d¥»¡C¤å¥ó½d¥»­t³d¦b¤å¥ó¡B
-	// ®Ø¬[µøµ¡»PÀËµø¶¡¶i¦æ³s±µ
+	// ç™»éŒ„æ‡‰ç”¨ç¨‹å¼çš„æ–‡ä»¶ç¯„æœ¬ã€‚æ–‡ä»¶ç¯„æœ¬è² è²¬åœ¨æ–‡ä»¶ã€
+	// æ¡†æ¶è¦–çª—èˆ‡æª¢è¦–é–“é€²è¡Œé€£æ¥
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
 		IDR_MAINFRAME,
 		RUNTIME_CLASS(CNTU_OCCDoc),
-		RUNTIME_CLASS(CMainFrame),       // ¥D SDI ®Ø¬[µøµ¡
+		RUNTIME_CLASS(CMainFrame),       // ä¸» SDI æ¡†æ¶è¦–çª—
 		RUNTIME_CLASS(CNTU_OCCView));
 	if (!pDocTemplate)
 		return FALSE;
 	AddDocTemplate(pDocTemplate);
 
 
-	// ­åªR¼Ğ·Ç Shell ©R¥O¡BDDE¡BÀÉ®×¶}±ÒÂÂÀÉªº©R¥O¦C
+	// å‰–ææ¨™æº– Shell å‘½ä»¤ã€DDEã€æª”æ¡ˆé–‹å•ŸèˆŠæª”çš„å‘½ä»¤åˆ—
 	CCommandLineInfo cmdInfo;
 	ParseCommandLine(cmdInfo);
 
 
 
-	// ¦b©R¥O¦C¤¤«ü©wªº¤À¬£©R¥O¡C¦pªG¤w¨Ï¥Î 
-	// /RegServer¡B/Register¡B/Unregserver ©Î /Unregister ±Ò°ÊÀ³¥Îµ{¦¡¡A±N¶Ç¦^ FALSE¡C
+	// åœ¨å‘½ä»¤åˆ—ä¸­æŒ‡å®šçš„åˆ†æ´¾å‘½ä»¤ã€‚å¦‚æœå·²ä½¿ç”¨ 
+	// /RegServerã€/Registerã€/Unregserver æˆ– /Unregister å•Ÿå‹•æ‡‰ç”¨ç¨‹å¼ï¼Œå°‡å‚³å› FALSEã€‚
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
 
-	// ¶Èªì©l¤Æ¤@­Óµøµ¡¡A©Ò¥HÅã¥Ü¨Ã§ó·s¸Óµøµ¡
+	// åƒ…åˆå§‹åŒ–ä¸€å€‹è¦–çª—ï¼Œæ‰€ä»¥é¡¯ç¤ºä¸¦æ›´æ–°è©²è¦–çª—
 	m_pMainWnd->ShowWindow(SW_SHOW);
 	m_pMainWnd->UpdateWindow();
-	// ¥u¦³¦b SDI À³¥Îµ{¦¡¤¤¦³«á¸m¦r¤¸®É¡A¤~©I¥s DragAcceptFiles
-	// ³o·|µo¥Í©ó ProcessShellCommand ¤§«á
+	// åªæœ‰åœ¨ SDI æ‡‰ç”¨ç¨‹å¼ä¸­æœ‰å¾Œç½®å­—å…ƒæ™‚ï¼Œæ‰å‘¼å« DragAcceptFiles
+	// é€™æœƒç™¼ç”Ÿæ–¼ ProcessShellCommand ä¹‹å¾Œ
 	return TRUE;
 }
 
 int CNTU_OCCApp::ExitInstance()
 {
-	// TODO: ³B²z¨ä¥L±z¤w¸g¥[¤Jªº¸ê·½
+	// TODO: è™•ç†å…¶ä»–æ‚¨å·²ç¶“åŠ å…¥çš„è³‡æº
 	AfxOleTerm(FALSE);
 
 	return CWinAppEx::ExitInstance();
 }
 
-// CNTU_OCCApp °T®§³B²z±`¦¡
+// CNTU_OCCApp è¨Šæ¯è™•ç†å¸¸å¼
 
 
-// ¹ï App About ¨Ï¥Î CAboutDlg ¹ï¸Ü¤è¶ô
+// å° App About ä½¿ç”¨ CAboutDlg å°è©±æ–¹å¡Š
 
 class CAboutDlg : public CDialogEx
 {
 public:
 	CAboutDlg();
 
-// ¹ï¸Ü¤è¶ô¸ê®Æ
+// å°è©±æ–¹å¡Šè³‡æ–™
 	enum { IDD = IDD_ABOUTBOX };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV ¤ä´©
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æ´
 
-// µ{¦¡½X¹ê§@
+// ç¨‹å¼ç¢¼å¯¦ä½œ
 protected:
 	DECLARE_MESSAGE_MAP()
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
 {
+	//cout<<"hello world"<<endl;
 }
 
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
@@ -195,14 +205,14 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
-// °õ¦æ¹ï¸Ü¤è¶ôªºÀ³¥Îµ{¦¡©R¥O
+// åŸ·è¡Œå°è©±æ–¹å¡Šçš„æ‡‰ç”¨ç¨‹å¼å‘½ä»¤
 void CNTU_OCCApp::OnAppAbout()
 {
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
 }
 
-// CNTU_OCCApp ¦Û­q¸ü¤J/Àx¦s¤èªk
+// CNTU_OCCApp è‡ªè¨‚è¼‰å…¥/å„²å­˜æ–¹æ³•
 
 void CNTU_OCCApp::PreLoadState()
 {
@@ -221,7 +231,7 @@ void CNTU_OCCApp::SaveCustomState()
 {
 }
 
-// CNTU_OCCApp °T®§³B²z±`¦¡
+// CNTU_OCCApp è¨Šæ¯è™•ç†å¸¸å¼
 
 
 

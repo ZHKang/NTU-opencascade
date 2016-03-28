@@ -10,7 +10,8 @@
 #endif
 
 #include "NTU_OCCDoc.h"
-
+#include "NTU_OCCView.h"
+#include "MainFrm.h"
 #include <propkey.h>
 
 #ifdef _DEBUG
@@ -44,10 +45,13 @@ CNTU_OCCDoc::CNTU_OCCDoc()
 	myAISContext->DefaultDrawer()->VIsoAspect()->SetNumber(11);
 
 	myAISContext->SetDisplayMode(AIS_Shaded,Standard_False);
+
+	m_pcoloredshapeList = new CColoredShapes();
 }
 
 CNTU_OCCDoc::~CNTU_OCCDoc()
-{
+{ 
+	if( m_pcoloredshapeList ) delete m_pcoloredshapeList;
 }
 
 BOOL CNTU_OCCDoc::OnNewDocument()
@@ -70,11 +74,16 @@ void CNTU_OCCDoc::Serialize(CArchive& ar)
 {
 	if (ar.IsStoring())
 	{
-		// TODO: 在此加入儲存程式碼
+		// TODO: add storing code here
+		ar << m_pcoloredshapeList;
 	}
 	else
 	{
-		// TODO: 在此加入載入程式碼
+		// Read from the archive the current CColoredShape
+		ar >> m_pcoloredshapeList;
+
+		// Display the new object
+		m_pcoloredshapeList->Display(myAISContext);
 	}
 }
 
@@ -152,5 +161,84 @@ void CNTU_OCCDoc::Dump(CDumpContext& dc) const
 
 void CNTU_OCCDoc::OnImportIges()
 {
-	// TODO: 在此加入您的命令處理常式程式碼
+	Handle(TopTools_HSequenceOfShape) aSeqOfShape = CNTU_OCCDoc::ReadIGES();
+	for(int i=1;i<= aSeqOfShape->Length();i++)
+	{
+		m_pcoloredshapeList->Add(Quantity_NOC_RED1, aSeqOfShape->Value(i));
+		m_pcoloredshapeList->Display(myAISContext);
+	}
+	//Fit();
 }
+
+void CNTU_OCCDoc::ReadIGES(const Handle(AIS_InteractiveContext)& anInteractiveContext)
+{
+	Handle(TopTools_HSequenceOfShape) aSequence = CNTU_OCCDoc::ReadIGES();
+	for(int i=1;i<= aSequence->Length();i++)
+		anInteractiveContext->Display(new AIS_Shape(aSequence->Value(i)));
+
+}
+
+Handle(TopTools_HSequenceOfShape) CNTU_OCCDoc::ReadIGES()// not by reference --> the sequence is created here !!
+{
+	CFileDialog dlg(TRUE,
+		NULL,
+		NULL,
+		OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+		L"IGES Files (*.iges , *.igs)|*.iges; *.igs|All Files (*.*)|*.*||",
+		NULL );
+
+	CString CASROOTValue;
+	CASROOTValue.GetEnvironmentVariable (L"CASROOT");
+	CString initdir = (CASROOTValue + "\\..\\data\\iges");
+
+	dlg.m_ofn.lpstrInitialDir = initdir;
+
+	Handle(TopTools_HSequenceOfShape) aSequence = new TopTools_HSequenceOfShape();
+	if (dlg.DoModal() == IDOK) 
+	{
+		SetCursor(AfxGetApp()->LoadStandardCursor(IDC_WAIT));
+		TCollection_ExtendedString aFileNameW ((Standard_ExtString )(const wchar_t* )dlg.GetPathName());
+		TCollection_AsciiString    aFileName  (aFileNameW, '?');
+		Standard_Integer status = ReadIGES (aFileName.ToCString(), aSequence);
+		if (status != IFSelect_RetDone)
+		{
+			MessageBoxW (AfxGetApp()->m_pMainWnd->m_hWnd, L"Error : The file is not read", L"CasCade Error", MB_ICONERROR);
+		}
+
+		SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+	}
+	return aSequence;
+}
+
+Standard_Integer CNTU_OCCDoc::ReadIGES(const Standard_CString& aFileName,
+	Handle(TopTools_HSequenceOfShape)& aHSequenceOfShape)
+{
+
+	IGESControl_Reader Reader;
+
+	Standard_Integer status = Reader.ReadFile(aFileName);
+
+	if (status != IFSelect_RetDone) return status;
+	Reader.TransferRoots();
+	TopoDS_Shape aShape = Reader.OneShape();     
+	aHSequenceOfShape->Append(aShape);
+
+	return status;
+}
+
+
+
+void CNTU_OCCDoc::Fit()
+{
+	CMainFrame *pFrame =  (CMainFrame*)AfxGetApp()->m_pMainWnd;
+	CNTU_OCCView *pView = (CNTU_OCCView *) pFrame->GetActiveView();
+	pView->FitAll();
+}
+
+//void FitAll() { if ( !myView.IsNull() ) myView->FitAll();  myView->ZFitAll(); };
+
+
+
+
+
+

@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="原始程式檔\OCCLib">
+      <UniqueIdentifier>{9959477c-ba21-4195-a8dd-1a771b55492f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="標頭檔\OCCLib">
+      <UniqueIdentifier>{b5c750b5-5cc4-406b-9a05-38744b562fc6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -57,6 +63,9 @@
     <ClInclude Include="Resource.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
+    <ClInclude Include="OCC3rdParty\Common\ImportExport\ColoredShapes.h">
+      <Filter>原始程式檔\OCCLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NTU_OCC.cpp">
@@ -73,6 +82,9 @@
     </ClCompile>
     <ClCompile Include="NTU_OCCView.cpp">
       <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="OCC3rdParty\Common\ImportExport\ColoredShapes.cpp">
+      <Filter>原始程式檔\OCCLib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
