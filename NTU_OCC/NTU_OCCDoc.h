@@ -6,8 +6,8 @@
 #pragma once
 #include <AIS_InteractiveContext.hxx>
 #include <V3d_Viewer.hxx>
-#include <OCC_3dDoc.h>
 #include <ColoredShapes.h>
+#include <OCC_3dDoc.h>
 
 class CNTU_OCCDoc : public CDocument
 {
@@ -55,13 +55,53 @@ public:
 	Handle(AIS_InteractiveContext)& GetAISContext() { return myAISContext; }
 	Handle(V3d_Viewer) GetViewer() { return myViewer; }
 	afx_msg void OnImportIges();
-
+	//  Import Files
+	//-----------IGES-----------
 	static void ReadIGES(const Handle(AIS_InteractiveContext)& anInteractiveContext);
 	static Handle(TopTools_HSequenceOfShape) ReadIGES(); // not by reference --> the sequence is created here !!
 	static Standard_Integer ReadIGES(const Standard_CString& aFileName,
 		Handle(TopTools_HSequenceOfShape)& aHSequenceOfShape);
+	//----------STEP------------
+	static void ReadSTEP(const Handle(AIS_InteractiveContext)& anInteractiveContext);
+	static Handle(TopTools_HSequenceOfShape) ReadSTEP(); // not by reference --> the sequence is created here !!
+	static IFSelect_ReturnStatus ReadSTEP(const Standard_CString& aFileName,
+		Handle(TopTools_HSequenceOfShape)& aHSequenceOfShape);
 	static void Fit();
+
+	//Events
+	virtual void DragEvent (const Standard_Integer /*theMouseX*/,
+		const Standard_Integer /*theMouseY*/,
+		const Standard_Integer /*theState*/,
+		const Handle(V3d_View)& /*theView*/) {}
+
+	virtual void InputEvent (const Standard_Integer /*theMouseX*/,
+		const Standard_Integer /*theMouseY*/,
+		const Handle(V3d_View)& /*theView*/) {}
+
+	virtual void MoveEvent (const Standard_Integer /*theMouseX*/,
+		const Standard_Integer /*theMouseY*/,
+		const Handle(V3d_View)& /*theView*/) {}
+
+	virtual void ShiftMoveEvent (const Standard_Integer /*theMouseX*/,
+		const Standard_Integer /*theMouseY*/,
+		const Handle(V3d_View)& /*theView*/) {}
+
+	virtual void ShiftDragEvent (const Standard_Integer /*theMouseX*/,
+		const Standard_Integer /*theMouseY*/,
+		const Standard_Integer /*theState*/,
+		const Handle(V3d_View)& /*theView*/) {}
+
+	virtual void ShiftInputEvent(const Standard_Integer /*theMouseX*/,
+		const Standard_Integer /*theMouseY*/,
+		const Handle(V3d_View)& /*theView*/) {}
+
+	virtual void Popup (const Standard_Integer /*theMouseX*/,
+		const Standard_Integer /*theMouseY*/,
+		const Handle(V3d_View)& /*theView*/) {}
 
 protected:
 	CColoredShapes* m_pcoloredshapeList;
+public:
+	afx_msg void OnFileImportStep();
+	afx_msg void OnFileImportCSFDB();
 };

@@ -104,6 +104,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="res\3dChildFrameTB.bmp" />
     <None Include="res\NTU_OCC.ico" />
     <None Include="res\NTU_OCC.rc2" />
     <None Include="res\NTU_OCCDoc.ico" />

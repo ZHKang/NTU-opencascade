@@ -546,7 +546,7 @@ public:
   //! Updates the view.
   //! @param theMargin [in] the margin coefficient for view borders.
   //! @param theToUpdate [in] flag to perform view update.
-  Standard_EXPORT   void FitAll (const Quantity_Coefficient theMargin = 0.01, const Standard_Boolean theToUpdate = Standard_True) ;
+  Standard_EXPORT   void FitAll (const Quantity_Coefficient theMargin = 0.001, const Standard_Boolean theToUpdate = Standard_True) ;
   
   //! Adjusts the viewing volume so as not to clip the displayed objects by front and back
   //! and back clipping planes. Also sets depth value automatically depending on the

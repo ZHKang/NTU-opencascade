@@ -24,6 +24,8 @@ IMPLEMENT_DYNCREATE(CNTU_OCCDoc, CDocument)
 
 BEGIN_MESSAGE_MAP(CNTU_OCCDoc, CDocument)
 	ON_COMMAND(ID_IMPORT_IGES, &CNTU_OCCDoc::OnImportIges)
+	ON_COMMAND(ID_IMPORT_STL, &CNTU_OCCDoc::OnFileImportStep)
+	ON_COMMAND(ID_IMPORT_CSFDB, &CNTU_OCCDoc::OnFileImportCSFDB)
 END_MESSAGE_MAP()
 
 
@@ -38,7 +40,6 @@ CNTU_OCCDoc::CNTU_OCCDoc()
 	myViewer = new V3d_Viewer(theGraphicDriver,a3DName.ToExtString()); 
 	myViewer->SetDefaultLights();
 	myViewer->SetLightOn();
-	myViewer->SetDefaultBackgroundColor(Quantity_NOC_BLACK);  // 設定初始背景顏色
 
 	myAISContext =new AIS_InteractiveContext(myViewer);  //创建一个交互文档
 	myAISContext->DefaultDrawer()->UIsoAspect()->SetNumber(11);
@@ -157,17 +158,23 @@ void CNTU_OCCDoc::Dump(CDumpContext& dc) const
 
 
 // CNTU_OCCDoc 命令
+//======================================================================
 
+//======================================================================
+//=                                                                    =
+//=                      IGES                                          =
+//=                                                                    =
+//======================================================================
 
 void CNTU_OCCDoc::OnImportIges()
 {
 	Handle(TopTools_HSequenceOfShape) aSeqOfShape = CNTU_OCCDoc::ReadIGES();
 	for(int i=1;i<= aSeqOfShape->Length();i++)
 	{
-		m_pcoloredshapeList->Add(Quantity_NOC_RED1, aSeqOfShape->Value(i));
+		m_pcoloredshapeList->Add(Quantity_NOC_VIOLET, aSeqOfShape->Value(i));
 		m_pcoloredshapeList->Display(myAISContext);
 	}
-	//Fit();
+	Fit();
 }
 
 void CNTU_OCCDoc::ReadIGES(const Handle(AIS_InteractiveContext)& anInteractiveContext)
@@ -220,25 +227,121 @@ Standard_Integer CNTU_OCCDoc::ReadIGES(const Standard_CString& aFileName,
 
 	if (status != IFSelect_RetDone) return status;
 	Reader.TransferRoots();
-	TopoDS_Shape aShape = Reader.OneShape();     
+	TopoDS_Shape aShape = Reader.OneShape();
 	aHSequenceOfShape->Append(aShape);
+
 
 	return status;
 }
 
 
+//======================================================================
 
+//======================================================================
+//=                                                                    =
+//=                      STEP                                          =
+//=                                                                    =
+//======================================================================
+
+void CNTU_OCCDoc::ReadSTEP(const Handle(AIS_InteractiveContext)& anInteractiveContext)
+{
+	Handle(TopTools_HSequenceOfShape) aSequence = CNTU_OCCDoc::ReadSTEP();
+	if (!aSequence.IsNull()) {	
+		for(int i=1;i<= aSequence->Length();i++)
+			anInteractiveContext->Display(new AIS_Shape(aSequence->Value(i)), Standard_False);
+	}
+}
+
+Handle(TopTools_HSequenceOfShape) CNTU_OCCDoc::ReadSTEP()// not by reference --> the sequence is created here !!
+{
+	CFileDialog dlg(TRUE,
+		NULL,
+		NULL,
+		OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+		L"STEP Files (*.stp;*.step)|*.stp; *.step|All Files (*.*)|*.*||",
+		NULL );
+
+	CString CASROOTValue;
+	CASROOTValue.GetEnvironmentVariable(L"CASROOT");
+	CString initdir = (CASROOTValue + "\\..\\data\\step");
+
+	dlg.m_ofn.lpstrInitialDir = initdir;
+
+	Handle(TopTools_HSequenceOfShape) aSequence= new TopTools_HSequenceOfShape();
+	if (dlg.DoModal() == IDOK) 
+	{
+		SetCursor(AfxGetApp()->LoadStandardCursor(IDC_WAIT));
+		TCollection_ExtendedString aFileNameW ((Standard_ExtString )(const wchar_t* )dlg.GetPathName());
+		TCollection_AsciiString    aFileName  (aFileNameW, '?');
+		IFSelect_ReturnStatus ReturnStatus = ReadSTEP (aFileName.ToCString(), aSequence);
+		switch (ReturnStatus) 
+		{
+		case IFSelect_RetError :
+			MessageBoxW (AfxGetApp()->m_pMainWnd->m_hWnd, L"Not a valid Step file", L"ERROR", MB_ICONWARNING);
+			break;
+		case IFSelect_RetFail :
+			MessageBoxW (AfxGetApp()->m_pMainWnd->m_hWnd, L"Reading has failed", L"ERROR", MB_ICONWARNING);
+			break;
+		case IFSelect_RetVoid :
+			MessageBoxW (AfxGetApp()->m_pMainWnd->m_hWnd, L"Nothing to transfer", L"ERROR", MB_ICONWARNING);
+			break;
+		}
+		SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));       
+	}
+	return aSequence;
+}
+
+IFSelect_ReturnStatus CNTU_OCCDoc::ReadSTEP(const Standard_CString& aFileName,
+	Handle(TopTools_HSequenceOfShape)& aHSequenceOfShape)
+{
+	aHSequenceOfShape->Clear();
+
+	// create additional log file
+	STEPControl_Reader aReader;
+	IFSelect_ReturnStatus status = aReader.ReadFile(aFileName);
+	if (status != IFSelect_RetDone)
+		return status;
+
+	aReader.WS()->MapReader()->SetTraceLevel(2); // increase default trace level
+
+	Standard_Boolean failsonly = Standard_False;
+	aReader.PrintCheckLoad(failsonly, IFSelect_ItemsByEntity);
+
+	// Root transfers
+	Standard_Integer nbr = aReader.NbRootsForTransfer();
+	aReader.PrintCheckTransfer (failsonly, IFSelect_ItemsByEntity);
+	for ( Standard_Integer n = 1; n<=nbr; n++) {
+		/*Standard_Boolean ok =*/ aReader.TransferRoot(n);
+	}
+
+	// Collecting resulting entities
+	Standard_Integer nbs = aReader.NbShapes();
+	if (nbs == 0) {
+		return IFSelect_RetVoid;
+	}
+	for (Standard_Integer i=1; i<=nbs; i++) {
+		aHSequenceOfShape->Append(aReader.Shape(i));
+	}
+
+	return status;
+}
 void CNTU_OCCDoc::Fit()
 {
 	CMainFrame *pFrame =  (CMainFrame*)AfxGetApp()->m_pMainWnd;
 	CNTU_OCCView *pView = (CNTU_OCCView *) pFrame->GetActiveView();
-	pView->FitAll();
+	pView->CNTU_OCCView::FitAll();
 }
-
-//void FitAll() { if ( !myView.IsNull() ) myView->FitAll();  myView->ZFitAll(); };
-
-
-
-
-
-
+void CNTU_OCCDoc::OnFileImportStep()
+{
+	Handle(TopTools_HSequenceOfShape) aSeqOfShape = CNTU_OCCDoc::ReadSTEP();
+	for(int i=1;i<= aSeqOfShape->Length();i++)
+	{
+		m_pcoloredshapeList->Add(Quantity_NOC_YELLOW, aSeqOfShape->Value(i));
+		m_pcoloredshapeList->Display(myAISContext);
+	}
+	Fit();
+}
+void CNTU_OCCDoc::OnFileImportCSFDB()
+{
+	// TODO: 在此加入您的命令處理常式程式碼
+}

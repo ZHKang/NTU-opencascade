@@ -60,6 +60,7 @@
 #include <BndLib_Add2dCurve.hxx>
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
 
 #include <BRepBuilderAPI.hxx> 
 #include <BRepAlgo.hxx> 
@@ -121,6 +122,10 @@
 #include <StdPrs_Curve.hxx>
 #include <StdPrs_Point.hxx>
 #include <StdPrs_PoleCurve.hxx>
+#include <STEPControl_Writer.hxx>
+#include <STEPConstruct_Styles.hxx>
+#include <STEPConstruct.hxx>
+#include <StepVisual_StyledItem.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TColgp_Array1OfPnt2d.hxx>
 #include <TColgp_HArray1OfPnt2d.hxx>
