@@ -1,1 +1,0 @@
-call "%~dp0env.bat" %1 %2 %3

@@ -16,7 +16,13 @@ enum CurAction3d {
 	CurAction3d_WindowZooming,
 	CurAction3d_DynamicPanning,
 	CurAction3d_GlobalPanning,
-	CurAction3d_DynamicRotation
+	CurAction3d_DynamicRotation,
+	CurAction3d_BeginSpotLight,
+	CurAction3d_TargetSpotLight,
+	CurAction3d_EndSpotLight,
+	CurAction3d_BeginPositionalLight,
+	CurAction3d_BeginDirectionalLight,
+	CurAction3d_EndDirectionalLight
 };
 
 class CNTU_OCCView : public CView
@@ -31,7 +37,12 @@ public:
 	void FitAll() {   if ( !myView.IsNull() ) myView->FitAll();  myView->ZFitAll(); };
 	void Redraw() {   if ( !myView.IsNull() ) myView->Redraw(); };
 	void SetZoom ( const Quantity_Factor& Coef  ) {   myView->SetZoom ( Coef  );  };
-	  Handle_V3d_View& GetView() { return myView; }
+	void GetViewAt (V3d_Coordinate& theX, V3d_Coordinate& theY, V3d_Coordinate& theZ) const;
+	void SetViewAt (const V3d_Coordinate theX, const V3d_Coordinate theY, const V3d_Coordinate theZ);
+	void GetViewEye (V3d_Coordinate& X, V3d_Coordinate& Y, V3d_Coordinate& Z);
+	void SetViewEye (const V3d_Coordinate X,const V3d_Coordinate Y,const V3d_Coordinate Z);
+	 Quantity_Factor GetViewScale();
+	Handle_V3d_View& GetView() { return myView; }
 // 作業
 public:
 
@@ -53,32 +64,19 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-protected:
+	int scaleX;
+	int scaleY;
+	int scaleZ;
 
 // 產生的訊息對應函式
 protected:
-	afx_msg void OnBUTTONAxo();
-	afx_msg void OnBUTTONBack();
-	afx_msg void OnBUTTONBottom();
-	afx_msg void OnBUTTONFront();
-	afx_msg void OnBUTTONHlrOff();
-	afx_msg void OnBUTTONHlrOn();
-	afx_msg void OnBUTTONLeft();
-	afx_msg void OnBUTTONPan();
-	afx_msg void OnBUTTONPanGlo();
-	afx_msg void OnBUTTONReset();
-	afx_msg void OnBUTTONRight();
-	afx_msg void OnBUTTONRot();
-	afx_msg void OnBUTTONTop();
-	afx_msg void OnBUTTONZoomAll();
 	afx_msg void OnFileExportImage();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnBUTTONZoomProg();
-	afx_msg void OnBUTTONZoomWin();
 
 	afx_msg void OnFilePrintPreview();
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
@@ -87,18 +85,10 @@ protected:
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
-
-	//afx_msg void OnUpdateBUTTONHlrOff(CCmdUI* pCmdUI);
-	//afx_msg void OnUpdateBUTTONHlrOn(CCmdUI* pCmdUI);
-	//afx_msg void OnUpdateBUTTONPanGlo(CCmdUI* pCmdUI);
-	//afx_msg void OnUpdateBUTTONPan(CCmdUI* pCmdUI);
-	//afx_msg void OnUpdateBUTTONZoomProg(CCmdUI* pCmdUI);
-	//afx_msg void OnUpdateBUTTONZoomWin(CCmdUI* pCmdUI);
-	//afx_msg void OnUpdateBUTTONRot(CCmdUI* pCmdUI);
-	afx_msg void OnModifyChangeBackground();
 	DECLARE_MESSAGE_MAP()
 protected:
 	Handle_V3d_View  myView;
+	Handle_Graphic3d_GraphicDriver myGraphicDriver;
 	CurAction3d      myCurrentMode;
 	Standard_Integer myXmin;
 	Standard_Integer myYmin;
@@ -111,13 +101,13 @@ protected:
 	enum LineStyle { Solid, Dot, ShortDash, LongDash, Default };
 	CPen*  m_Pen;
 
-	//virtual void DrawRectangle (const Standard_Integer  MinX  ,
-	//	const Standard_Integer  MinY  ,
-	//	const Standard_Integer  MaxX  ,
-	//	const Standard_Integer  MaxY  ,
-	//	const Standard_Boolean  Draw  ,
-	//	const LineStyle aLineStyle = Default  );
-	
+	virtual void DrawRectangle (const Standard_Integer  MinX  ,
+		const Standard_Integer  MinY  ,
+		const Standard_Integer  MaxX  ,
+		const Standard_Integer  MaxY  ,
+		const Standard_Boolean  Draw  ,
+		const LineStyle aLineStyle = Default  );
+
 };
 
 

@@ -19,6 +19,13 @@
 
 #include <OpenGl_GraphicDriver.hxx>
 
+#define ValZWMin 1
+#define X_Key 0x58
+#define Y_Key 0x59
+#define Z_Key 0x5A
+
+#define ModelClipping
+
 #ifdef _DEBUG
 //#define new DEBUG_NEW
 #endif
@@ -29,26 +36,8 @@
 IMPLEMENT_DYNCREATE(CNTU_OCCView, CView)
 
 BEGIN_MESSAGE_MAP(CNTU_OCCView, CView)
-	// 標準列印命
-	ON_COMMAND(ID_BUTTONAxo, OnBUTTONAxo)
-	ON_COMMAND(ID_BUTTONBack, OnBUTTONBack)
-	ON_COMMAND(ID_BUTTONBottom, OnBUTTONBottom)
-	ON_COMMAND(ID_BUTTONFront, OnBUTTONFront)
-	ON_COMMAND(ID_BUTTONHlrOff, OnBUTTONHlrOff)
-	ON_COMMAND(ID_BUTTONHlrOn, OnBUTTONHlrOn)
-	ON_COMMAND(ID_BUTTONLeft, OnBUTTONLeft)
-	ON_COMMAND(ID_BUTTONPan, OnBUTTONPan)
-	ON_COMMAND(ID_BUTTONPanGlo, OnBUTTONPanGlo)
-	ON_COMMAND(ID_BUTTONReset, OnBUTTONReset)
-	ON_COMMAND(ID_BUTTONRight, OnBUTTONRight)
-	ON_COMMAND(ID_BUTTONRot, OnBUTTONRot)
-	ON_COMMAND(ID_BUTTONTop, OnBUTTONTop)
-	ON_COMMAND(ID_BUTTONZoomAll, OnBUTTONZoomAll)
 	ON_WM_SIZE()
 	ON_COMMAND(ID_FILE_EXPORT_IMAGE, OnFileExportImage)
-	ON_COMMAND(ID_BUTTONZoomProg, OnBUTTONZoomProg)
-	ON_COMMAND(ID_BUTTONZoomWin, OnBUTTONZoomWin)
-
 	ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CNTU_OCCView::OnFilePrintPreview)
@@ -61,15 +50,6 @@ BEGIN_MESSAGE_MAP(CNTU_OCCView, CView)
 	ON_WM_MBUTTONDOWN()
 	ON_WM_MBUTTONUP()
 	ON_WM_MOUSEWHEEL()
-
-	//ON_UPDATE_COMMAND_UI(ID_BUTTONHlrOff, OnUpdateBUTTONHlrOff)
-	//ON_UPDATE_COMMAND_UI(ID_BUTTONHlrOn, OnUpdateBUTTONHlrOn)
-	//ON_UPDATE_COMMAND_UI(ID_BUTTONPanGlo, OnUpdateBUTTONPanGlo)
-	//ON_UPDATE_COMMAND_UI(ID_BUTTONPan, OnUpdateBUTTONPan)
-	//ON_UPDATE_COMMAND_UI(ID_BUTTONZoomProg, OnUpdateBUTTONZoomProg)
-	//ON_UPDATE_COMMAND_UI(ID_BUTTONZoomWin, OnUpdateBUTTONZoomWin)
-	//ON_UPDATE_COMMAND_UI(ID_BUTTONRot, OnUpdateBUTTONRot)
-	//ON_COMMAND(ID_Modify_ChangeBackground     , OnModifyChangeBackground)
 END_MESSAGE_MAP()
 
 // CNTU_OCCView 建構/解構
@@ -92,11 +72,8 @@ CNTU_OCCView::CNTU_OCCView()
 
 CNTU_OCCView::~CNTU_OCCView()
 {
-	if (myView)
-	{
-		myView->Remove();
-	}
-
+	myView->Remove();
+	if (m_Pen) delete m_Pen;
 }
 
 BOOL CNTU_OCCView::PreCreateWindow(CREATESTRUCT& cs)
@@ -175,99 +152,6 @@ void CNTU_OCCView::OnSize(UINT /*nType*/, int /*cx*/, int /*cy*/)
 	if (!myView.IsNull())
 		myView->MustBeResized();
 }
-
-// See the back View
-void CNTU_OCCView::OnBUTTONBack() 
-{
-	myView->SetProj(V3d_Xneg);
-} 
-
-// See the front View
-void CNTU_OCCView::OnBUTTONFront() 
-{
-	myView->SetProj(V3d_Xpos);
-} 
-
-// See the bottom View
-void CNTU_OCCView::OnBUTTONBottom() 
-{
-	myView->SetProj(V3d_Zneg);
-}
-
-// See the top View
-void CNTU_OCCView::OnBUTTONTop() 
-{
-	myView->SetProj(V3d_Zpos);
-} 	
-
-// See the left View
-void CNTU_OCCView::OnBUTTONLeft() 
-{
-	myView->SetProj(V3d_Ypos);
-}
-
-// See the right View
-void CNTU_OCCView::OnBUTTONRight() 
-{
-	myView->SetProj(V3d_Yneg);
-} 
-
-// See the axonometric View
-void CNTU_OCCView::OnBUTTONAxo() 
-{
-	myView->SetProj(V3d_XposYnegZpos);
-} 
-
-void CNTU_OCCView::OnBUTTONHlrOff() 
-{
-	myHlrModeIsOn = Standard_False;
-	myView->SetComputedMode (myHlrModeIsOn);
-}
-
-void CNTU_OCCView::OnBUTTONHlrOn() 
-{
-	SetCursor(AfxGetApp()->LoadStandardCursor(IDC_WAIT));
-	myHlrModeIsOn = Standard_True;
-	myView->SetComputedMode (myHlrModeIsOn);
-	SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-}
-
-void CNTU_OCCView::OnBUTTONPan() 
-{
-	myCurrentMode = CurAction3d_DynamicPanning;
-}
-
-void CNTU_OCCView::OnBUTTONPanGlo() 
-{
-	// save the current zoom value 
-	myCurZoom = myView->Scale();
-	// Do a Global Zoom 
-	//myView->FitAll();
-	// Set the mode 
-	myCurrentMode = CurAction3d_GlobalPanning;
-}
-
-void CNTU_OCCView::OnBUTTONReset() 
-{
-	myView->Reset();
-}
-
-void CNTU_OCCView::OnBUTTONRot() 
-{
-	myCurrentMode = CurAction3d_DynamicRotation; 
-}
-
-void CNTU_OCCView::OnBUTTONZoomAll() 
-{
-	myView->FitAll();
-	myView->ZFitAll();
-}
-
-void CNTU_OCCView::OnBUTTONZoomProg() 
-{  myCurrentMode = CurAction3d_DynamicZooming; }
-
-void CNTU_OCCView::OnBUTTONZoomWin() 
-{  myCurrentMode = CurAction3d_WindowZooming; }
 
 
 
@@ -382,7 +266,7 @@ void CNTU_OCCView::OnLButtonUp(UINT nFlags, CPoint point)
 			} else
 			{
 				myXmax=point.x;    myYmax=point.y;
-				//DrawRectangle(myXmin,myYmin,myXmax,myYmax,Standard_False);
+				DrawRectangle(myXmin,myYmin,myXmax,myYmax,Standard_False);
 				if (nFlags & MK_SHIFT)
 					GetDocument()->ShiftDragEvent(point.x,point.y,1,myView);
 				else
@@ -393,15 +277,15 @@ void CNTU_OCCView::OnLButtonUp(UINT nFlags, CPoint point)
 			myCurrentMode = CurAction3d_Nothing;
 			break;
 		case CurAction3d_WindowZooming :
-			//myXmax=point.x;        myYmax=point.y;
-			//DrawRectangle(myXmin,myYmin,myXmax,myYmax,Standard_False);
-			//if ((abs(myXmin-myXmax)>ValZWMin) || (abs(myYmin-myYmax)>ValZWMin))
-			//	// Test if the zoom window is greater than a minimale window.
-			//{
-			//	// Do the zoom window between Pmin and Pmax
-			//	myView->WindowFitAll(myXmin,myYmin,myXmax,myYmax);  
-			//}  
-			//myCurrentMode = CurAction3d_Nothing;
+			myXmax=point.x;        myYmax=point.y;
+			DrawRectangle(myXmin,myYmin,myXmax,myYmax,Standard_False);
+			if ((abs(myXmin-myXmax)>ValZWMin) || (abs(myYmin-myYmax)>ValZWMin))
+				// Test if the zoom window is greater than a minimale window.
+			{
+				// Do the zoom window between Pmin and Pmax
+				myView->WindowFitAll(myXmin,myYmin,myXmax,myYmax);  
+			}  
+			myCurrentMode = CurAction3d_Nothing;
 			break;
 		case CurAction3d_DynamicPanning :
 			myCurrentMode = CurAction3d_Nothing;
@@ -489,7 +373,7 @@ void CNTU_OCCView::OnMouseMove(UINT nFlags, CPoint point)
 			switch (myCurrentMode)
 			{
 			case CurAction3d_Nothing :
-				//DrawRectangle(myXmin,myYmin,myXmax,myYmax,Standard_False);
+				DrawRectangle(myXmin,myYmin,myXmax,myYmax,Standard_False);
 				myXmax = point.x;
 				myYmax = point.y;
 
@@ -497,28 +381,7 @@ void CNTU_OCCView::OnMouseMove(UINT nFlags, CPoint point)
 					GetDocument()->ShiftDragEvent(myXmax,myYmax,0,myView);
 				else
 					GetDocument()->DragEvent(myXmax,myYmax,0,myView);
-				//DrawRectangle(myXmin,myYmin,myXmax,myYmax,Standard_True);
-
-				break;
-			case CurAction3d_DynamicZooming :
-				myView->Zoom(myXmax,myYmax,point.x,point.y); 
-				// save the current mouse coordinate in min \n";
-				myXmax=point.x;  myYmax=point.y;
-				break;
-			case CurAction3d_WindowZooming :
-				myXmax = point.x; myYmax = point.y;	
-				//DrawRectangle(myXmin,myYmin,myXmax,myYmax,Standard_False,LongDash);
-				//DrawRectangle(myXmin,myYmin,myXmax,myYmax,Standard_True,LongDash);
-				break;
-			case CurAction3d_DynamicPanning :
-				myView->Pan(point.x-myXmax,myYmax-point.y); // Realize the panning
-				myXmax = point.x; myYmax = point.y;	
-				break;
-			case CurAction3d_GlobalPanning : // nothing           
-				break;
-			case  CurAction3d_DynamicRotation :
-				myView->Rotation(point.x,point.y);
-				myView->Redraw();
+				DrawRectangle(myXmin,myYmin,myXmax,myYmax,Standard_True);
 				break;
 			default :
 				Standard_Failure::Raise(" incompatible Current Mode ");
@@ -552,89 +415,6 @@ void CNTU_OCCView::OnMouseMove(UINT nFlags, CPoint point)
 	}
 }
 
-//void CNTU_OCCView::OnMouseMove(UINT nFlags, CPoint point)  
-//{  
-//	CView::OnMouseMove(nFlags, point);
-//	if(nFlags && MK_LBUTTON ){
-//		myView->Rotation(point.x,point.y);
-//		myView->Redraw();
-//	}
-//
-//	//   ============================  MIDDLE BUTTON =======================
-//	if ( nFlags & MK_MBUTTON)
-//	{
-//		if ( nFlags & MK_CONTROL ) 
-//		{
-//			myView->Pan(point.x-myXmax,myYmax-point.y); // Realize the panning
-//			myXmax = point.x; myYmax = point.y;	
-//
-//		}
-//	}
-//}  
-//
-//void CNTU_OCCView::OnRButtonUp(UINT /* nFlags */, CPoint point)
-//{
-//	////ClientToScreen(&point);
-//	////OnContextMenu(this, point);
-//	//SetCursor(AfxGetApp()->LoadStandardCursor(IDC_WAIT));
-//	//myView->SetComputedMode (myHlrModeIsOn);
-//	//SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-//}
-//
-//void CNTU_OCCView::OnMouseMove(UINT nFlags, CPoint point)  
-//{  
-//	CView::OnMouseMove(nFlags, point);
-//	if(nFlags && MK_LBUTTON ){
-//		myView->Rotation(point.x,point.y);
-//		myView->Redraw();
-//	}
-//
-//	//   ============================  MIDDLE BUTTON =======================
-//	if ( nFlags & MK_MBUTTON)
-//	{
-//		if ( nFlags & MK_CONTROL ) 
-//		{
-//			myView->Pan(point.x-myXmax,myYmax-point.y); // Realize the panning
-//			myXmax = point.x; myYmax = point.y;	
-//
-//		}
-//	}
-//}  
-//void CNTU_OCCView::OnLButtonDblClk(UINT nFlags, CPoint point)
-//{
-//}
-//
-//
-//void CNTU_OCCView::OnLButtonDown(UINT nFlags, CPoint point)
-//{
-//}
-//
-//
-//void CNTU_OCCView::OnLButtonUp(UINT nFlags, CPoint point)
-//{
-//
-//}
-//
-//
-//void CNTU_OCCView::OnMButtonDblClk(UINT nFlags, CPoint point)
-//{
-//}
-//
-//
-//void CNTU_OCCView::OnMButtonDown(UINT nFlags, CPoint point)
-//{
-//}
-//
-//
-//void CNTU_OCCView::OnMButtonUp(UINT nFlags, CPoint point)
-//{
-//
-//}
-//
-//
-//void CNTU_OCCView::OnRButtonDown(UINT nFlags, CPoint point)
-//{
-//}
 
 
 BOOL CNTU_OCCView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
@@ -648,4 +428,61 @@ BOOL CNTU_OCCView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	if (myXmax < 0)    myYmax = 0;
 	myView->Zoom(myXmax,myYmax,pt.x,pt.y);
 	return CView::OnMouseWheel(nFlags, zDelta, pt);
+}
+
+
+void CNTU_OCCView::DrawRectangle(const Standard_Integer  MinX    ,
+	const Standard_Integer  MinY    ,
+	const Standard_Integer  MaxX ,
+	const Standard_Integer  MaxY ,
+	const Standard_Boolean  Draw , 
+	const LineStyle aLineStyle)
+{
+	static int m_DrawMode;
+	if  (!m_Pen && aLineStyle ==Solid )
+	{m_Pen = new CPen(PS_SOLID, 1, RGB(0,0,0)); m_DrawMode = R2_MERGEPENNOT;}
+	else if (!m_Pen && aLineStyle ==Dot )
+	{m_Pen = new CPen(PS_DOT, 1, RGB(0,0,0));   m_DrawMode = R2_XORPEN;}
+	else if (!m_Pen && aLineStyle == ShortDash)
+	{m_Pen = new CPen(PS_DASH, 1, RGB(255,0,0));	m_DrawMode = R2_XORPEN;}
+	else if (!m_Pen && aLineStyle == LongDash)
+	{m_Pen = new CPen(PS_DASH, 1, RGB(0,0,0));	m_DrawMode = R2_NOTXORPEN;}
+	else if (aLineStyle == Default) 
+	{ m_Pen = NULL;	m_DrawMode = R2_MERGEPENNOT;}
+
+	CPen* aOldPen = NULL;
+	CClientDC clientDC(this);
+	if (m_Pen) aOldPen = clientDC.SelectObject(m_Pen);
+	clientDC.SetROP2(m_DrawMode);
+
+	static		Standard_Integer StoredMinX, StoredMaxX, StoredMinY, StoredMaxY;
+	static		Standard_Boolean m_IsVisible;
+
+	if ( m_IsVisible && !Draw) // move or up  : erase at the old position 
+	{
+		clientDC.MoveTo(StoredMinX,StoredMinY); 
+		clientDC.LineTo(StoredMinX,StoredMaxY); 
+		clientDC.LineTo(StoredMaxX,StoredMaxY); 
+		clientDC.LineTo(StoredMaxX,StoredMinY); 
+		clientDC.LineTo(StoredMinX,StoredMinY);
+		m_IsVisible = false;
+	}
+
+	StoredMinX = Min ( MinX, MaxX );
+	StoredMinY = Min ( MinY, MaxY );
+	StoredMaxX = Max ( MinX, MaxX );
+	StoredMaxY = Max ( MinY, MaxY);
+
+	if (Draw) // move : draw
+	{
+		clientDC.MoveTo(StoredMinX,StoredMinY); 
+		clientDC.LineTo(StoredMinX,StoredMaxY); 
+		clientDC.LineTo(StoredMaxX,StoredMaxY); 
+		clientDC.LineTo(StoredMaxX,StoredMinY); 
+		clientDC.LineTo(StoredMinX,StoredMinY);
+		m_IsVisible = true;
+	}
+
+	if (m_Pen) 
+		clientDC.SelectObject(aOldPen);
 }
