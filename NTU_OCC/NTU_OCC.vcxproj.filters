@@ -69,6 +69,9 @@
     <ClInclude Include="OCC3rdParty\Common\ImportExport\ColoredShapes.h">
       <Filter>原始程式檔\OCCLib</Filter>
     </ClInclude>
+    <ClInclude Include="NTUproject.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NTU_OCC.cpp">
@@ -88,6 +91,9 @@
     </ClCompile>
     <ClCompile Include="OCC3rdParty\Common\ImportExport\ColoredShapes.cpp">
       <Filter>原始程式檔\OCCLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NTUproject.cpp">
+      <Filter>原始程式檔</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

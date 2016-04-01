@@ -13,6 +13,7 @@
 #include "NTU_OCCView.h"
 #include "MainFrm.h"
 #include <propkey.h>
+#include "NTUproject.h"
 
 #ifdef _DEBUG
 //#define new DEBUG_NEW
@@ -26,6 +27,7 @@ BEGIN_MESSAGE_MAP(CNTU_OCCDoc, CDocument)
 	ON_COMMAND(ID_IMPORT_IGES, &CNTU_OCCDoc::OnImportIges)
 	ON_COMMAND(ID_IMPORT_STL, &CNTU_OCCDoc::OnFileImportStep)
 	ON_COMMAND(ID_IMPORT_CSFDB, &CNTU_OCCDoc::OnFileImportCSFDB)
+	ON_COMMAND(ID_FCN_LOADATOM, &CNTU_OCCDoc::OnFcnLoadatom)
 END_MESSAGE_MAP()
 
 
@@ -342,6 +344,12 @@ void CNTU_OCCDoc::OnFileImportStep()
 	Fit();
 }
 void CNTU_OCCDoc::OnFileImportCSFDB()
+{
+	// TODO: 在此加入您的命令處理常式程式碼
+}
+
+
+void CNTU_OCCDoc::OnFcnLoadatom()
 {
 	// TODO: 在此加入您的命令處理常式程式碼
 }

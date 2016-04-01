@@ -104,4 +104,5 @@ protected:
 public:
 	afx_msg void OnFileImportStep();
 	afx_msg void OnFileImportCSFDB();
+	afx_msg void OnFcnLoadatom();
 };

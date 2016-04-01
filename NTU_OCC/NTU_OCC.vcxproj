@@ -114,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="NTUproject.h" />
     <ClInclude Include="NTU_OCC.h" />
     <ClInclude Include="NTU_OCCDoc.h" />
     <ClInclude Include="NTU_OCCView.h" />
@@ -124,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="NTUproject.cpp" />
     <ClCompile Include="NTU_OCC.cpp" />
     <ClCompile Include="NTU_OCCDoc.cpp" />
     <ClCompile Include="NTU_OCCView.cpp" />
